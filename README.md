@@ -95,7 +95,7 @@ openssl genrsa -out jane.key 2048
 ```
 openssl req -new -key jane.key -sunj “/CN=jane” -o
 ```
-*extra tip:* get contente from csr file -> ```openssl req -in myuser.csr -text -noout```
+*extra tip:* get content from csr file -> ```openssl req -in myuser.csr -text -noout```
 
 3-Get certificate generated on step 2 converted to base64
 
