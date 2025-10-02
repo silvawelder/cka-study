@@ -96,9 +96,12 @@ openssl genrsa -out jane.key 2048
 openssl req -new -key jane.key -sunj “/CN=jane” -o
 ```
 
-3-Send request file to the administrator generated on step 2 converted to base64
+3-Get certificate generated on step 2 converted to base64
 
-4-
+```
+cat myuser.csr | base64 | tr -d "\n"
+```
+4- Get base64 certificate date and create the certificate signing request on kubernetes file
 
 ```yaml
 apiVersion: certificates.k8s.io/v1
@@ -113,3 +116,19 @@ spec:
   usages:
   - client auth
 ```
+
+5- get status of certificate signing request
+
+```
+kubectl get csr
+```
+
+5- approve or deny certificate signing request
+
+```
+kubectl certificate approve myuser
+```
+```
+kubectl certificate deny myuser
+```
+
