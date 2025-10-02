@@ -4,74 +4,103 @@
 kubectl set image deployment/frontend simple-webapp=kodekloud/webapp-color:v2
 
 ## Enviroment variables
-kubectl run webapp-color --image=kodekloud/webapp-color --labels=name=webapp-color --env=APP_COLOR=green --dry-run=client -o yaml > app.yaml
 
+```
+kubectl run webapp-color --image=kodekloud/webapp-color --labels=name=webapp-color --env=APP_COLOR=green --dry-run=client -o yaml > app.yaml
+```
+
+```
 kubectl create configmap webapp-config-map --from-literal=APP_COLOR=darkblue --from-literal=APP_OTHER=disregard
+```
 
 ## Enviroment variables using secrets
+
+```
 kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123 --dry-run=client -o yaml > db-secret.yaml
+```
 
+```
 kubectl run webapp-pod --image=kodekloud/simple-webapp-mysql  --dry-run=client -o yaml > app.yaml
+```
 
+```
 kubectl autoscale deploy nginx-deployment --max=3 --cpu-percent=80
-
+```
 
 
 ## Cluster maintainance
 
 ### Backup etcd
+
+- Backup command
+```
 ETCDCTL_API=3 etcdctl \
 --endpoints=https://127.0.0.1:2379 \
 --cacert=/etc/kubernetes/pki/etcd/ca.crt \
 --cert=/etc/kubernetes/pki/etcd/server.crt \
 --key=/etc/kubernetes/pki/etcd/server.key \
 snapshot save /opt/snapshot-pre-boot.db
+```
 
+- check backup command
 
+```
 etcdctl snapshot status /opt/snapshot-pre-boot.db \
 --write-out=table
-
+```
 ### Restore
 - Stop kube-apiserver (if necessary)
 
-- Backup command
-```etcdctl snapshot restore /opt/snapshot-pre-boot.db –data-dir /var/lib/restored```
+- Restore command
+```
+etcdctl snapshot restore /opt/snapshot-pre-boot.db –data-dir /var/lib/restored
+```
 
 - Change data dir etcd config
 
   —-data-dir=/var/lib/restored
 
--Change volume path
+- Change volume path on etcd config
 
 
 
 
 ## Certificates
 
-View content inside kubernetes certificates
+### View content inside kubernetes certificates
 
+- API server certificate
+```
 openssl x509 -in /etc/kubernetes/pki/apiserver.crt -text -noout
-
+```
+- ETCD server certificate
+```
 openssl x509 -in /etc/kubernetes/pki/etcd/server.crt -text -noout
-
+```
+- CA root certificate
+```
 openssl x509 -in /etc/kubernetes/pki/ca.crt -text -noout
+```
 
 Creating Certificate Signing Request
 
 1-User create a key
 
+```
 openssl genrsa -out jane.key 2048
-
+```
 
 2-User creates a certificate signing request
 
+```
 openssl req -new -key jane.key -sunj “/CN=jane” -o
+```
 
 3-Send request file to the administrator generated on step 2 converted to base64
 
 4-
 
-
+```yaml
 apiVersion: certificates.k8s.io/v1
 kind: CertificateSigningRequest
 metadata:
@@ -83,3 +112,4 @@ spec:
   expirationSeconds: 86400  # one day
   usages:
   - client auth
+```
