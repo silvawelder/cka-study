@@ -95,14 +95,19 @@ openssl genrsa -out jane.key 2048
 ```
 openssl req -new -key jane.key -sunj “/CN=jane” -o
 ```
-*extra tip:* get content from csr file -> ```openssl req -in myuser.csr -text -noout```
+*extra tip* - get content from csr file:
+
+```
+openssl req -in myuser.csr -text -noout
+
+```
 
 3-Get certificate generated on step 2 converted to base64
 
 ```
-cat myuser.csr | base64 | tr -d "\n"
+cat myuser.csr | base64 -w 0
 ```
-4- Get base64 certificate date and create the certificate signing request on kubernetes file
+4- Get base64 certificate date and create/apply the certificate signing request on kubernetes file
 
 ```yaml
 apiVersion: certificates.k8s.io/v1
@@ -133,3 +138,21 @@ kubectl certificate approve myuser
 kubectl certificate deny myuser
 ```
 
+## Authentication
+
+## Autorization
+
+- Create a role
+
+```
+kubectl create role developer --verb=get --verb=list --verb=watch --resource=pods
+
+```
+
+- binding a role
+
+```
+kubectl create rolebinding dev-user-binding --role=developer --user=dev-user
+
+```
+kubectl edit roles developer -n blue
